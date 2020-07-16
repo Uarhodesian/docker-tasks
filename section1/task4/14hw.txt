@@ -1,1 +1,1 @@
-docker run -it alpine cat /etc/passwd
+docker run -it alpine wc -l /etc/passwd
