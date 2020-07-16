@@ -1,0 +1,40 @@
+docker run -it centos /bin/bash
+	yum install gcc -y
+	yum install make -y
+	yum install vim -y
+	vim hello.c
+		int main () {
+  			puts("Hello, world!");
+  			return 0;
+		}
+	make hello
+	/hello
+	sha256sum /hello
+
+docker run -it ubuntu /bin/bash
+	apt update
+	apt-get install gcc -y
+	apt-get install make -y
+	apt-get install make -y vim -y
+	vim hello.c
+		int main () {
+  			puts("Hello, world!");
+  			return 0;
+		}
+	make hello
+	/hello
+	sha256sum /hello
+docker ps -a -s
+
+docker cp 329b1a723126:/hello /home/docker/hello_ubuntu
+docker cp 1a261ed0ab7a:/hello /home/docker/hello_centos
+
+docker cp /home/docker/hello_ubuntu 1a261ed0ab7a:/hello_ubuntu
+docker cp /home/docker/hello_centos 329b1a723126:/hello_centos
+
+docker exec -it 329b1a723126 /bin/bash
+docker exec -it 1a261ed0ab7a /bin/bash
+
+sha256sum hello_ubuntu
+sha256sum hello_centos
+sha256sum hello

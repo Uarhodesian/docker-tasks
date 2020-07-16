@@ -1,0 +1,4 @@
+docker run hello-world
+docker ps -l
+docker cp 6064079deb43:/hello /home/ubuntu/docker/hello
+sha256sum hello

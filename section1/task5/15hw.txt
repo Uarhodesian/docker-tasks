@@ -1,0 +1,3 @@
+docker run -it busybox
+	df
+docker run -it busybox df

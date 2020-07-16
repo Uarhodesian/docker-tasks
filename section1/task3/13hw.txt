@@ -1,0 +1,3 @@
+docker run -it centos /bin/bash
+cd bin
+sha256sum sha256sum

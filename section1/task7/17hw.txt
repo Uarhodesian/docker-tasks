@@ -1,0 +1,5 @@
+docker run -d -p 8080:80 nginx
+docker exec -it 9f88f6222f4d /bin/bash
+	ps aux
+	apt-get update && apt-get install -y procps
+	ps aux | grep httpd
