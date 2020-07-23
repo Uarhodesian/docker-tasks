@@ -1,0 +1,16 @@
+===
+web2
+===
+cd /home/ubuntu/docker/DKN/Practices/Section2/Stage1/web/
+	nano Dockerfile
+		DBHOST='172.31.14.28'
+docker build ./ -t web
+docker network create mynet
+docker run -d -p 8081:80 --name web1 --net mynet web 
+docker run -d -p 8082:80 --name web2 --net mynet web 
+===
+proxy2
+===
+cd /home/ubuntu/docker/DKN/Practices/Section2/Stage2/proxy
+docker build ./ -t proxy
+docker run -d -p 8080:80 --name proxy1 --net mynet proxy

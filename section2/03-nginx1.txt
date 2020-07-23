@@ -1,0 +1,23 @@
+172.31.12.17
+===
+nginx.conf
+===
+http {
+    upstream webapp {
+        server web1:80;
+        server web2:80;
+        server 172.31.15.176:8082;
+        server 172.31.15.176:8081;
+        keepalive 10;
+    }
+
+    server {
+        resolver 127.0.0.11 valid=10s;
+
+        listen 80;
+
+        location / {
+            proxy_pass http://webapp;
+        }
+    }
+}

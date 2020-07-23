@@ -1,0 +1,6 @@
+===
+db
+===
+cd /home/ubuntu/docker/DKN/Practices/Section2/Stage1/db/
+docker build ./ -t db
+docker run -d -p 5432:5432 --name db db

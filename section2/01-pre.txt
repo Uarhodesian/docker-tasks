@@ -1,0 +1,11 @@
+db: 172.31.14.28
+web1: 172.31.12.17
+web2: 172.31.15.176
+===
+pre-condition
+===
+sudo su
+snap install docker
+export PATH=$PATH:/snap/bin
+mkdir docker && cd docker
+git clone https://github.com/ask4ua/DKN
