@@ -2,6 +2,8 @@ git clone https://github.com/ask4ua/DKN
 ===
 kubectl create namespace student04
 ===
+kubectl apply -f dpl.yaml
+===
 kubectl create clusterrolebinding serviceaccounts-cluster-admin \
   --clusterrole=cluster-admin \
   --group=system:serviceaccounts
