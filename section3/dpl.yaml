@@ -128,11 +128,10 @@ spec:
             weight: 100
       containers:
       - name: webapp
-        image: vovolkov/webapp:fix #---1---Web app should always be deployed from the latest image version
-	imagePullPolicy: Always
+        image: vovolkov/webapp:fix 
         ports:
         - containerPort: 80
-        imagePullPolicy: Always
+        imagePullPolicy: Always #---1---Web app should always be deployed from the latest image version
         livenessProbe:
           httpGet:
             path: /
