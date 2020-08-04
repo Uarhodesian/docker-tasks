@@ -128,7 +128,8 @@ spec:
             weight: 100
       containers:
       - name: webapp
-        image: vovolkov/webapp:latest #---1---Web app should always be deployed from the latest image version
+        image: vovolkov/webapp:fix #---1---Web app should always be deployed from the latest image version
+	imagePullPolicy: Always
         ports:
         - containerPort: 80
         imagePullPolicy: Always
