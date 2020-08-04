@@ -1,0 +1,145 @@
+#---ConfigMap
+apiVersion: v1
+kind: ConfigMap
+data:
+  DBHOST: "webappdb"
+metadata:
+  name: webapp-configmap
+---
+#---Secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: webapp-secret
+stringData:
+  DBUSER: "NEWDBUSER"
+  DBPASS: "NEWDBPASS"
+  DBNAME: "NEWDBNAME"
+---
+#---Service-DB
+apiVersion: v1
+kind: Service
+metadata:
+  name: webappdb
+  labels:
+    app: db
+spec:
+  selector:
+    app: db
+  ports:
+     - port: 5432
+---
+#---Service-Webapp
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp
+  labels:
+    app: webapp
+spec:
+  selector:
+    app: webapp
+    rollout: webapp_old
+  type: NodePort
+  ports:
+     - port: 80
+       nodePort: 32004
+---
+#---Deployment-DB
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+   app: db
+  name: db
+spec:
+  replicas: 1 #---1.db---DB part of service should contain only 1 instance.
+  strategy:
+    type: Recreate #---2.db---DB part should be redeployed in recreate mode.
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+      - name: db
+        image: vovolkov/db
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: webapp-secret
+              key: DBUSER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: webapp-secret
+              key: DBPASS
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: webapp-secret
+              key: DBNAME
+        volumeMounts:
+          - mountPath: /var/lib/postgresql/data/
+            name: db-volume
+      volumes:
+      - name: db-volume
+        emptyDir: {}
+---
+#---Deployment-Webapp
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+   app: webapp
+  name: webapp
+spec:
+  replicas: 2 #---2---Web app should consists of no less then 2 instances after successfull redeployment
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1        #---3---Web app should be redeployed keeping no less than 1 instance running during redeployment
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      affinity: #---4---Web app instances should be distributed as much as possible between different cluster nodes.
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - webapp
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+      containers:
+      - name: webapp
+        image: vovolkov/webapp:latest #---1---Web app should always be deployed from the latest image version
+        ports:
+        - containerPort: 80
+        imagePullPolicy: Always
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        envFrom:
+        - configMapRef:
+            name: webapp-configmap
+        - secretRef:
+            name: webapp-secret
